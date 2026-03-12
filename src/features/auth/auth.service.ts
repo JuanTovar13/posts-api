@@ -1,72 +1,47 @@
-import { AuthRepository } from './auth.repository';
-import {
-  AuthenticateUserDTO,
-  CreateUserDTO,
-  UpdateUserDTO,
-  User,
-} from './auth.types';
+import { AuthenticateUserDTO, CreateUserDTO } from './auth.types';
 import Boom from '@hapi/boom';
+import { supabase } from '../../config/supabase';
+import {
+  AuthResponse,
+  AuthTokenResponsePassword,
+  UserResponse,
+} from '@supabase/supabase-js';
 
 export class AuthService {
-  private authRepository: AuthRepository;
+  constructor() {}
 
-  constructor(authRepository: AuthRepository) {
-    this.authRepository = authRepository;
-  }
-
-  getUserById = (userId: string): User => {
-    const userFound = this.authRepository.getUserById(userId);
-
-    if (!userFound) {
-      throw Boom.notFound('User not found');
-    }
-
-    return userFound;
-  };
-
-  authenticateUser = (credentials: AuthenticateUserDTO): User => {
-    const userFound =
-      this.authRepository.getUserByEmailAndPassword(credentials);
-
-    if (!userFound) {
-      throw Boom.unauthorized('Invalid credentials');
-    }
-
-    return userFound;
-  };
-
-  createUser = (data: CreateUserDTO): User => {
-    const emailTaken = this.authRepository.getUserByEmail(data.email);
-
-    if (emailTaken) {
-      throw Boom.conflict('Email already in use');
-    }
-
-    const newUser = this.authRepository.createUser({
-      email: data.email,
-      password: data.password,
-      role: data.role,
-      name: data.name,
-      address: data.address,
+  authenticateUser = async (
+    credentials: AuthenticateUserDTO
+  ): Promise<AuthTokenResponsePassword['data']> => {
+    const signInResponse = await supabase.auth.signInWithPassword({
+      email: credentials.email,
+      password: credentials.password,
     });
 
-    return newUser;
-  };
-
-  updateUser = (user: UpdateUserDTO): User => {
-    const { id, name, address } = user;
-    const userExists = this.authRepository.getUserById(id);
-
-    if (!userExists) {
-      throw Boom.notFound('User not found');
+    if (signInResponse.error) {
+      throw Boom.unauthorized(signInResponse.error.message);
     }
 
-    const userUpdated = this.authRepository.updateUser({
-      id,
-      name,
-      address,
+    return signInResponse.data;
+  };
+
+  createUser = async (user: CreateUserDTO): Promise<AuthResponse['data']> => {
+    const signUpResponse = await supabase.auth.signUp({
+      email: user.email,
+      password: user.password,
+      options: {
+        data: {
+          name: user.name,
+          address: user.address,
+          role: user.role,
+        },
+      },
     });
 
-    return userUpdated;
+    if (signUpResponse.error) {
+      throw Boom.badRequest(signUpResponse.error.message);
+    }
+
+    return signUpResponse.data;
   };
 }

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import Boom from '@hapi/boom';
 import { PostService } from './post.service';
+import { getUserFromRequest } from '../../middlewares/authMiddleware';
 
 export class PostController {
   private postService: PostService;
@@ -9,6 +10,8 @@ export class PostController {
   }
 
   getPosts = (req: Request, res: Response) => {
+    const user = getUserFromRequest(req);
+    console.log(user);
     const posts = this.postService.getPosts();
     return res.json(posts);
   };
@@ -24,14 +27,10 @@ export class PostController {
       throw Boom.badRequest('Request body is required');
     }
 
-    const { title, description, imageUrl, userId } = req.body;
+    const { title, description, imageUrl } = req.body;
 
     if (title === undefined) {
       throw Boom.badRequest('Title is required');
-    }
-
-    if (userId === undefined) {
-      throw Boom.badRequest('User ID is required');
     }
 
     if (description === undefined) {
@@ -42,11 +41,13 @@ export class PostController {
       throw Boom.badRequest('Image URL is required');
     }
 
+    const user = getUserFromRequest(req);
+
     const post = this.postService.createPost({
       title,
       description,
       imageUrl,
-      userId,
+      userId: user.id,
     });
 
     return res.json(post);

@@ -10,13 +10,7 @@ export class AuthController {
     this.authService = authService;
   }
 
-  getUserById = (req: Request, res: Response) => {
-    const { id } = req.params;
-    const user = this.authService.getUserById(String(id));
-    return res.json(user);
-  };
-
-  authenticateUser = (req: Request, res: Response) => {
+  authenticateUser = async (req: Request, res: Response) => {
     if (!req.body) {
       throw Boom.badRequest('Request body is required');
     }
@@ -31,11 +25,11 @@ export class AuthController {
       throw Boom.badRequest('Password is required');
     }
 
-    const user = this.authService.authenticateUser({ email, password });
+    const user = await this.authService.authenticateUser({ email, password });
     return res.json(user);
   };
 
-  createUser = (req: Request, res: Response) => {
+  createUser = async (req: Request, res: Response) => {
     if (!req.body) {
       throw Boom.badRequest('Request body is required');
     }
@@ -56,19 +50,7 @@ export class AuthController {
       );
     }
 
-    const user = this.authService.createUser({ email, password, role });
+    const user = await this.authService.createUser({ email, password, role });
     return res.status(201).json(user);
-  };
-
-  updateUser = (req: Request, res: Response) => {
-    if (!req.body) {
-      throw Boom.badRequest('Request body is required');
-    }
-
-    const { id } = req.params;
-    const { name, address } = req.body;
-
-    const user = this.authService.updateUser({ id: String(id), name, address });
-    return res.json(user);
   };
 }
