@@ -45,39 +45,22 @@ export const getOrderById = async (id: string) => {
 }
 
 
-export const createOrder = async (data: CreateOrderDTO) => {
+export const createOrderService = async (
+  consumerId: string,
+  storeId: string
+) => {
 
-  const { consumer_id, store_id, items } = data
-
-  if (!consumer_id || !store_id || !items || items.length === 0) {
-    throw Boom.badRequest("consumer_id, store_id and items are required")
-  }
-
-  const orderResult = await pool.query(
+  const result = await pool.query(
     `
-    INSERT INTO orders(consumer_id, store_id)
-    VALUES($1,$2)
+    INSERT INTO orders (consumer_id, store_id)
+    VALUES ($1,$2)
     RETURNING *
     `,
-    [consumer_id, store_id]
-  )
+    [consumerId, storeId]
+  );
 
-  const order = orderResult.rows[0]
-
-  for (const item of items) {
-
-    await pool.query(
-      `
-      INSERT INTO order_items(order_id, product_id, quantity)
-      VALUES($1,$2,$3)
-      `,
-      [order.id, item.product_id, item.quantity]
-    )
-
-  }
-
-  return order
-}
+  return result.rows[0];
+};
 
 
 export const assignDelivery = async (

@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from "express"
 import * as service from "./order.service"
+import Boom from "@hapi/boom";
+import { createOrderService } from "./order.service";
+import { getUserFromRequest } from "../../middlewares/authMiddleware";
 
 export const getOrders = async (
   req: Request,
@@ -41,24 +44,27 @@ export const getOrder = async (
 }
 
 
-export const createOrder = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const createOrderController = async (req: Request, res: Response) => {
 
-  try {
-
-    const order = await service.createOrder(req.body)
-
-    res.status(201).json(order)
-
-  } catch (err) {
-    next(err)
+  if (!req.body) {
+    throw Boom.badRequest("Request body is required");
   }
 
-}
+  const { store_id } = req.body;
 
+  if (!store_id) {
+    throw Boom.badRequest("store_id is required");
+  }
+
+  const user = getUserFromRequest(req);
+
+  const order = await createOrderService(
+    String(user.id),
+    String(store_id)
+  );
+
+  return res.status(201).json(order);
+};
 
 export const assignDelivery = async (
   req: Request,

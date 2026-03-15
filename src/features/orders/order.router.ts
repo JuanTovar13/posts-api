@@ -1,3 +1,4 @@
+
 import { Router } from "express"
 import * as controller from "./order.controller"
 import { authMiddleware } from '../../middlewares/authMiddleware';
@@ -14,7 +15,7 @@ ordersRouter.get("/", controller.getOrders)
 ordersRouter.get("/:id", controller.getOrder)
 
 // crear orden
-ordersRouter.post("/",rolesMiddleware([UserRole.CONSUMER]), controller.createOrder)
+ordersRouter.post("/",rolesMiddleware([UserRole.CONSUMER]), controller.createOrderController)
 
 // asignar delivery
 ordersRouter.patch("/:id/delivery", rolesMiddleware([UserRole.DELIVERY]), controller.assignDelivery)

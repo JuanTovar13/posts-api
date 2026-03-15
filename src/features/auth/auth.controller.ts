@@ -43,7 +43,11 @@ export const createUserController = async (
     throw Boom.badRequest("Request body is required")
   }
 
-  const { email, password, role } = req.body
+  const { email, password,name, role } = req.body
+
+  if (!name) {
+  throw Boom.badRequest("Name is required");
+}
 
   if (!email) {
     throw Boom.badRequest("Email is required")
@@ -62,6 +66,7 @@ export const createUserController = async (
   const user = await createUserService({
     email,
     password,
+    name,
     role
   })
 

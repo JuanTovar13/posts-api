@@ -8,6 +8,7 @@ import { storesRouter } from "./features/stores/store.router"
 import {productsRouter} from "./features/products/product.router"
 import { ordersRouter } from "./features/orders/order.router"
 import { deliveryRouter } from "./features/deliveries/delivery.router"
+import { itemsRouter } from "./features/order-items/items.router";
 
 const app = express();
 app.use(express.json());
@@ -26,6 +27,7 @@ app.use("/stores", storesRouter)
 app.use("/products", productsRouter)
 app.use("/orders", ordersRouter)
 app.use("/delivery", deliveryRouter)
+app.use("/order-items", itemsRouter);
 
 
 

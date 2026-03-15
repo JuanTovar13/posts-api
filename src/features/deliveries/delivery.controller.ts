@@ -1,66 +1,51 @@
-import { Request, Response, NextFunction } from "express"
-import * as service from "./delivery.service"
+import { Request, Response } from "express";
+import Boom from "@hapi/boom";
+import {
+  getAvailableOrdersService,
+  acceptOrderService,
+  getMyOrdersService
+} from "./delivery.service";
+import { getUserFromRequest } from "../../middlewares/authMiddleware";
 
-export const getAvailableOrders = async (
+export const getAvailableOrdersController = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ) => {
 
-  try {
+  const orders = await getAvailableOrdersService();
 
-    const orders = await service.getAvailableOrders()
+  return res.json(orders);
+};
 
-    res.json(orders)
-
-  } catch (err) {
-    next(err)
-  }
-
-}
-
-
-export const getMyOrders = async (
+export const acceptOrderController = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ) => {
 
-  try {
+  const { id } = req.params;
 
-    const { id } = req.params
-
-    const orders = await service.getMyOrders(String(id))
-
-    res.json(orders)
-
-  } catch (err) {
-    next(err)
+  if (!id) {
+    throw Boom.badRequest("Order id is required");
   }
 
-}
+  const user = getUserFromRequest(req);
 
+  const order = await acceptOrderService(
+    String(id),
+    String(user.id)
+  );
 
-export const takeOrder = async (
+  return res.json(order);
+};
+
+export const getMyOrdersController = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ) => {
 
-  try {
+  const user = getUserFromRequest(req);
 
-    const { id } = req.params
-    const { delivery_id } = req.body
+  const orders = await getMyOrdersService(String(user.id));
 
-    const order = await service.takeOrder(
-      String(id),
-      delivery_id
-    )
-
-    res.json(order)
-
-  } catch (err) {
-    next(err)
-  }
-
-}
+  return res.json(orders);
+};

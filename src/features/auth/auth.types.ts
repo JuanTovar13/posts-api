@@ -12,5 +12,6 @@ export interface AuthenticateUserDTO {
 export interface CreateUserDTO {
   email: string
   password: string
+  name: string
   role: UserRole
 }

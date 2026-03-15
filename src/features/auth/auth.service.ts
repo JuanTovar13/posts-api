@@ -25,6 +25,7 @@ export const authenticateUserService = async ({
 export const createUserService = async ({
   email,
   password,
+  name,
   role
 }: CreateUserDTO) => {
 
@@ -41,15 +42,28 @@ export const createUserService = async ({
 
   await pool.query(
     `
-    INSERT INTO users(id, role)
-    VALUES($1,$2)
+    INSERT INTO users(id,name, role)
+    VALUES($1,$2,$3)
     `,
-    [userId, role]
+    [userId, name, role]
   )
+
+  if (role === "store") {
+
+    await pool.query(
+      `
+      INSERT INTO stores( name, user_id)
+      VALUES($1,$2)
+      `,
+      [`${name}'s Store`, userId]
+    );
+
+  }
 
   return {
     id: userId,
     email,
+    name,
     role
   }
 }
