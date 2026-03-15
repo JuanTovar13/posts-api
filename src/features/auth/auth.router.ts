@@ -1,16 +1,17 @@
-import { Router } from 'express';
-import { AuthController } from './auth.controller';
-import { authMiddleware } from '../../middlewares/authMiddleware';
+import { Router } from "express"
+import {
+  authenticateUserController,
+  createUserController
+} from "./auth.controller"
 
-export class AuthRouter {
-  public router: Router;
-  private authController: AuthController;
+export const authRouter = Router()
 
-  constructor(authController: AuthController) {
-    this.authController = authController;
-    this.router = Router();
-    this.router.use(authMiddleware);
-    this.router.post('/login', this.authController.authenticateUser);
-    this.router.post('/register', this.authController.createUser);
-  }
-}
+authRouter.post(
+  "/login",
+  authenticateUserController
+)
+
+authRouter.post(
+  "/register",
+  createUserController
+)

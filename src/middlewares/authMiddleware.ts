@@ -26,7 +26,6 @@ export const authMiddleware = async (
 
   const token = req.headers.authorization.split(' ')[1];
 
-  //no hay token
   if (!token) {
     throw Boom.unauthorized('Token is missing');
   }
@@ -36,7 +35,6 @@ export const authMiddleware = async (
   if (userResponse.error) {
     throw Boom.unauthorized(userResponse.error.message);
   }
-
 
   req.user = userResponse.data.user;
   next();

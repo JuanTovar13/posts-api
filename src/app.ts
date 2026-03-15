@@ -2,14 +2,12 @@ import express, { Router } from 'express';
 import { NODE_ENV, PORT } from './config';
 import cors from 'cors';
 import { errorsMiddleware } from './middlewares/errorsMiddleware';
-import { PostService } from './features/posts/post.service';
-import { PostController } from './features/posts/post.controller';
-import { PostRouter } from './features/posts/post.router';
-import { AuthService } from './features/auth/auth.service';
-import { AuthController } from './features/auth/auth.controller';
-import { AuthRouter } from './features/auth/auth.router';
-
-import { pool } from './config/database';
+import { authRouter } from "./features/auth/auth.router"
+import { usersRouter } from "./features/users/users.router"
+import { storesRouter } from "./features/stores/store.router"
+import {productsRouter} from "./features/products/product.router"
+import { ordersRouter } from "./features/orders/order.router"
+import { deliveryRouter } from "./features/deliveries/delivery.router"
 
 const app = express();
 app.use(express.json());
@@ -19,28 +17,22 @@ app.get('/', (req, res) => {
   res.send('Hello, World!!!!!');
 });
 
-const apiRouter = Router();
-app.use('/api', apiRouter);
-
-// Repositories
-
-
-// Services
-const postService = new PostService();
-const authService = new AuthService();
-
-// Controllers
-const postController = new PostController(postService);
-const authController = new AuthController(authService);
-
-// Router
-const postRouter = new PostRouter(postController);
-const authRouter = new AuthRouter(authController);
-
 // Routes
-apiRouter.use('/posts', postRouter.router);
-apiRouter.use('/auth', authRouter.router);
+const apiRouter = Router();
+app.use("/auth", authRouter)
+app.use('/api', apiRouter);
+app.use("/users", usersRouter)
+app.use("/stores", storesRouter)
+app.use("/products", productsRouter)
+app.use("/orders", ordersRouter)
+app.use("/delivery", deliveryRouter)
 
+
+
+
+
+
+// Error Handling Middleware
 app.use(errorsMiddleware);
 
 if (NODE_ENV !== 'production') {

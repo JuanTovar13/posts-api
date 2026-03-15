@@ -1,47 +1,55 @@
-import { AuthenticateUserDTO, CreateUserDTO } from './auth.types';
-import Boom from '@hapi/boom';
-import { supabase } from '../../config/supabase';
-import {
-  AuthResponse,
-  AuthTokenResponsePassword,
-  UserResponse,
-} from '@supabase/supabase-js';
+import Boom from "@hapi/boom"
+import { supabase } from "../../config/supabase"
+import { pool } from "../../config/database"
+import { AuthenticateUserDTO, CreateUserDTO } from "./auth.types"
 
-export class AuthService {
-  constructor() {}
+export const authenticateUserService = async ({
+  email,
+  password
+}: AuthenticateUserDTO) => {
 
-  authenticateUser = async (
-    credentials: AuthenticateUserDTO
-  ): Promise<AuthTokenResponsePassword['data']> => {
-    const signInResponse = await supabase.auth.signInWithPassword({
-      email: credentials.email,
-      password: credentials.password,
-    });
+  const { data, error } =
+    await supabase.auth.signInWithPassword({
+      email,
+      password
+    })
 
-    if (signInResponse.error) {
-      throw Boom.unauthorized(signInResponse.error.message);
-    }
+  if (error) {
+    throw Boom.unauthorized(error.message)
+  }
 
-    return signInResponse.data;
-  };
+  return data
+}
 
-  createUser = async (user: CreateUserDTO): Promise<AuthResponse['data']> => {
-    const signUpResponse = await supabase.auth.signUp({
-      email: user.email,
-      password: user.password,
-      options: {
-        data: {
-          name: user.name,
-          address: user.address,
-          role: user.role,
-        },
-      },
-    });
 
-    if (signUpResponse.error) {
-      throw Boom.badRequest(signUpResponse.error.message);
-    }
+export const createUserService = async ({
+  email,
+  password,
+  role
+}: CreateUserDTO) => {
 
-    return signUpResponse.data;
-  };
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password
+  })
+
+  if (error || !data.user) {
+    throw Boom.badRequest(error?.message || "Error creating user")
+  }
+
+  const userId = data.user.id
+
+  await pool.query(
+    `
+    INSERT INTO users(id, role)
+    VALUES($1,$2)
+    `,
+    [userId, role]
+  )
+
+  return {
+    id: userId,
+    email,
+    role
+  }
 }
