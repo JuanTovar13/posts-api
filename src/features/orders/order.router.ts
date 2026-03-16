@@ -11,8 +11,13 @@ ordersRouter.use(authMiddleware);
 // ver órdenes
 ordersRouter.get("/", controller.getOrders)
 
+//ver ordenes de un consumidor
+ordersRouter.get("/consumer/:id", controller.getOrdersByConsumerController)
+
 // ver orden específica
 ordersRouter.get("/:id", controller.getOrder)
+
+
 
 // crear orden
 ordersRouter.post("/",rolesMiddleware([UserRole.CONSUMER]), controller.createOrderController)

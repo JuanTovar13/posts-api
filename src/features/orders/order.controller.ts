@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express"
 import * as service from "./order.service"
 import Boom from "@hapi/boom";
-import { createOrderService } from "./order.service";
+import { createOrderService, getOrdersByConsumerService } from "./order.service";
 import { getUserFromRequest } from "../../middlewares/authMiddleware";
 
 export const getOrders = async (
@@ -42,6 +42,28 @@ export const getOrder = async (
   }
 
 }
+
+export const getOrdersByConsumerController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+
+    const { id } = req.params;
+
+    const orders =
+      await getOrdersByConsumerService(String(id));
+
+    res.json(orders);
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: "Error fetching orders",
+    });
+
+  }
+};
 
 
 export const createOrderController = async (req: Request, res: Response) => {

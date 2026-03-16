@@ -11,6 +11,27 @@ export const getOrders = async () => {
   return result.rows
 }
 
+export const getOrdersByConsumerService = async (
+  consumerId: string
+) => {
+
+  const result = await pool.query(
+    `
+    SELECT
+      id,
+      store_id,
+      status,
+      created_at
+    FROM orders
+    WHERE consumer_id = $1
+    ORDER BY created_at DESC
+    `,
+    [consumerId]
+  );
+
+  return result.rows;
+};
+
 
 export const getOrderById = async (id: string) => {
 
