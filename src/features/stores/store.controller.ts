@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express"
 import * as service from "./store.service"
+import { supabase } from "../../config/supabase";
+import { getStoreByUserId } from "./store.service";
 
 export const getStores = async (
   req: Request,
@@ -57,6 +59,34 @@ export const createStore = async (
 
 }
 
+export const getMyStore = async (req: Request, res: Response) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      return res.status(401).json({ message: "Missing token" });
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+
+    const { data, error } = await supabase.auth.getUser(token);
+
+    if (error || !data.user) {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+
+    const store = await getStoreByUserId(data.user.id);
+
+    if (!store) {
+      return res.status(404).json({ message: "Store not found" });
+    }
+
+    res.json(store);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 export const openStore = async (
   req: Request,

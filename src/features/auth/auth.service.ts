@@ -14,11 +14,35 @@ export const authenticateUserService = async ({
       password
     })
 
-  if (error) {
-    throw Boom.unauthorized(error.message)
+  if (error || !data.user) {
+    throw Boom.unauthorized(error?.message || "Invalid credentials")
   }
 
-  return data
+  const userId = data.user.id
+
+  // buscar el usuario en tu tabla users
+  const result = await pool.query(
+    `
+    SELECT id, name, role
+    FROM users
+    WHERE id = $1
+    `,
+    [userId]
+  )
+
+  if (result.rows.length === 0) {
+    throw Boom.notFound("User not found in database")
+  }
+
+  const user = result.rows[0]
+
+  return {
+    session: data.session,
+    user: data.user,
+    role: user.role,
+    name: user.name,
+    id: user.id
+  }
 }
 
 

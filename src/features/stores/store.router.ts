@@ -2,6 +2,7 @@ import { Router } from "express"
 import * as controller from "./store.controller"
 import { authMiddleware } from "../../middlewares/authMiddleware";
 
+
 export const storesRouter = Router()
 
 storesRouter.use(authMiddleware);
@@ -11,6 +12,7 @@ storesRouter.get("/", controller.getStores)
 
 // ver tienda específica
 storesRouter.get("/:id", controller.getStore)
+
 
 // crear tienda
 storesRouter.post("/", controller.createStore)

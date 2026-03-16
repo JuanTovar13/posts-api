@@ -1,6 +1,6 @@
 import { pool } from "../../config/database"
 import Boom from "@hapi/boom"
-import { CreateStoreDTO } from "./store.types"
+import { CreateStoreDTO, Store } from "./store.types"
 
 export const getStores = async () => {
 
@@ -31,6 +31,18 @@ export const getStoreById = async (id: string) => {
   return store
 }
 
+export const getStoreByUserId = async (userId: string): Promise<Store | null> => {
+  const result = await pool.query(
+    `SELECT * FROM stores WHERE user_id = $1`,
+    [userId]
+  );
+
+  if (result.rows.length === 0) {
+    return null;
+  }
+
+  return result.rows[0] as Store;
+};
 
 export const createStore = async (data: CreateStoreDTO) => {
 
@@ -49,6 +61,7 @@ export const createStore = async (data: CreateStoreDTO) => {
 
   return result.rows[0]
 }
+
 
 
 export const openStore = async (id: string) => {
