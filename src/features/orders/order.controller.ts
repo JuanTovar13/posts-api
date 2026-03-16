@@ -3,6 +3,7 @@ import * as service from "./order.service"
 import Boom from "@hapi/boom";
 import { createOrderService, getOrdersByConsumerService } from "./order.service";
 import { getUserFromRequest } from "../../middlewares/authMiddleware";
+import { getOrdersWithItemsByConsumerService } from "./order.service";
 
 export const getOrders = async (
   req: Request,
@@ -43,28 +44,6 @@ export const getOrder = async (
 
 }
 
-export const getOrdersByConsumerController = async (
-  req: Request,
-  res: Response
-) => {
-  try {
-
-    const { id } = req.params;
-
-    const orders =
-      await getOrdersByConsumerService(String(id));
-
-    res.json(orders);
-
-  } catch (error) {
-
-    res.status(500).json({
-      message: "Error fetching orders",
-    });
-
-  }
-};
-
 
 export const createOrderController = async (req: Request, res: Response) => {
 
@@ -86,6 +65,30 @@ export const createOrderController = async (req: Request, res: Response) => {
   );
 
   return res.status(201).json(order);
+};
+
+export const getOrdersByConsumerController = async (
+  req: Request,
+  res: Response
+) => {
+
+  const { id } = req.params;
+
+  const orders = await getOrdersWithItemsByConsumerService(String(id));
+
+  res.json(orders);
+};
+
+export const deleteOrderController = async (
+  req: Request,
+  res: Response
+) => {
+
+  const { id } = req.params;
+
+  const order = await service.deleteOrderService(String(id));
+
+  res.json(order);
 };
 
 export const assignDelivery = async (

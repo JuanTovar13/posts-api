@@ -32,6 +32,30 @@ export const getOrdersByConsumerService = async (
   return result.rows;
 };
 
+export const getOrdersWithItemsByConsumerService = async (
+  consumerId: string
+) => {
+
+  const result = await pool.query(
+    `
+    SELECT 
+      o.id as order_id,
+      o.status,
+      o.created_at,
+      p.name as product_name,
+      oi.quantity
+    FROM orders o
+    JOIN order_items oi ON oi.order_id = o.id
+    JOIN products p ON p.id = oi.product_id
+    WHERE o.consumer_id = $1
+    ORDER BY o.created_at DESC
+    `,
+    [consumerId]
+  );
+
+  return result.rows;
+};
+
 
 export const getOrderById = async (id: string) => {
 
@@ -78,6 +102,20 @@ export const createOrderService = async (
     RETURNING *
     `,
     [consumerId, storeId]
+  );
+
+  return result.rows[0];
+};
+
+export const deleteOrderService = async (orderId: string) => {
+
+  const result = await pool.query(
+    `
+    DELETE FROM orders
+    WHERE id = $1
+    RETURNING *
+    `,
+    [orderId]
   );
 
   return result.rows[0];

@@ -17,7 +17,8 @@ ordersRouter.get("/consumer/:id", controller.getOrdersByConsumerController)
 // ver orden específica
 ordersRouter.get("/:id", controller.getOrder)
 
-
+// borrar orden
+ordersRouter.delete("/:id",rolesMiddleware([UserRole.CONSUMER]),controller.deleteOrderController);
 
 // crear orden
 ordersRouter.post("/",rolesMiddleware([UserRole.CONSUMER]), controller.createOrderController)
