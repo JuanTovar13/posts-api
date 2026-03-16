@@ -45,26 +45,20 @@ export const getOrder = async (
 }
 
 
-export const createOrderController = async (req: Request, res: Response) => {
+export const createOrderController = async (
+  req: Request,
+  res: Response
+) => {
 
-  if (!req.body) {
-    throw Boom.badRequest("Request body is required");
-  }
+  const { consumer_id, store_id, items } = req.body;
 
-  const { store_id } = req.body;
-
-  if (!store_id) {
-    throw Boom.badRequest("store_id is required");
-  }
-
-  const user = getUserFromRequest(req);
-
-  const order = await createOrderService(
-    String(user.id),
-    String(store_id)
+  const order = await service.createOrderService(
+    consumer_id,
+    store_id,
+    items
   );
 
-  return res.status(201).json(order);
+  res.json(order);
 };
 
 export const getOrdersByConsumerController = async (

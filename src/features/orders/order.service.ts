@@ -2,6 +2,11 @@ import { pool } from "../../config/database"
 import Boom from "@hapi/boom"
 import { CreateOrderDTO } from "./order.types"
 
+interface OrderItemDTO {
+  product_id: string;
+  quantity: number;
+}
+
 export const getOrders = async () => {
 
   const result = await pool.query(`
@@ -92,19 +97,51 @@ export const getOrderById = async (id: string) => {
 
 export const createOrderService = async (
   consumerId: string,
-  storeId: string
+  storeId: string,
+  items: OrderItemDTO[]
 ) => {
 
-  const result = await pool.query(
-    `
-    INSERT INTO orders (consumer_id, store_id)
-    VALUES ($1,$2)
-    RETURNING *
-    `,
-    [consumerId, storeId]
-  );
+  const client = await pool.connect();
 
-  return result.rows[0];
+  try {
+
+    await client.query("BEGIN");
+
+    const orderResult = await client.query(
+      `
+      INSERT INTO orders (consumer_id, store_id)
+      VALUES ($1,$2)
+      RETURNING *
+      `,
+      [consumerId, storeId]
+    );
+
+    const order = orderResult.rows[0];
+
+    for (const item of items) {
+      await client.query(
+        `
+        INSERT INTO order_items (order_id, product_id, quantity)
+        VALUES ($1,$2,$3)
+        `,
+        [order.id, item.product_id, item.quantity]
+      );
+    }
+
+    await client.query("COMMIT");
+
+    return order;
+
+  } catch (error) {
+
+    await client.query("ROLLBACK");
+    throw error;
+
+  } finally {
+
+    client.release();
+
+  }
 };
 
 export const deleteOrderService = async (orderId: string) => {
