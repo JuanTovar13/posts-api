@@ -11,7 +11,8 @@ export const getAvailableOrdersService = async () => {
       s.name as store_name
     FROM orders o
     JOIN stores s ON s.id = o.store_id
-    WHERE o.delivery_id = $1
+    WHERE o.delivery_id IS NULL
+    AND o.status = 'pending'
     ORDER BY o.created_at DESC
     `
   );
