@@ -41,8 +41,14 @@ export const getMyOrdersService = async (deliveryId: string) => {
 
   const result = await pool.query(
     `
-    SELECT * FROM orders
-    WHERE delivery_id = $1
+    SELECT 
+      o.id,
+      o.status,
+      s.name as store_name
+    FROM orders o
+    JOIN stores s ON s.id = o.store_id
+    WHERE o.delivery_id = $1
+    ORDER BY o.created_at DESC
     `,
     [deliveryId]
   );
