@@ -64,9 +64,14 @@ export const getOrdersWithItemsByConsumerService = async (
 
 export const getOrderById = async (id: string) => {
 
+  // 🔹 Orden + nombre de tienda
   const orderResult = await pool.query(
     `
-    SELECT o.*, s.name as store_name
+    SELECT 
+      o.id,
+      o.status,
+      o.created_at,
+      s.name as store_name
     FROM orders o
     JOIN stores s ON s.id = o.store_id
     WHERE o.id = $1
@@ -80,11 +85,11 @@ export const getOrderById = async (id: string) => {
     throw Boom.notFound("Order not found");
   }
 
+  // 🔹 Items con nombre de producto
   const itemsResult = await pool.query(
     `
     SELECT 
-      p.name,
-      p.price,
+      p.name as product_name,
       oi.quantity
     FROM order_items oi
     JOIN products p ON p.id = oi.product_id
