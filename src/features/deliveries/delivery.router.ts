@@ -13,8 +13,11 @@ deliveryRouter.use(rolesMiddleware([UserRole.DELIVERY]));
 // ver órdenes disponibles
 deliveryRouter.get("/orders/available", controller.getAvailableOrdersController)
 
-// ver órdenes de un delivery
+// tomar orden
 deliveryRouter.post("/orders/:id/accept", controller.acceptOrderController)
 
-// tomar orden
+// ver órdenes de un delivery
 deliveryRouter.get("/orders/my", controller.getMyOrdersController);
+
+//declinar orden
+deliveryRouter.patch("/orders/:id/decline",controller.declineOrderController);

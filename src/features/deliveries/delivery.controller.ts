@@ -3,7 +3,8 @@ import Boom from "@hapi/boom";
 import {
   getAvailableOrdersService,
   acceptOrderService,
-  getMyOrdersService
+  getMyOrdersService,
+  declineOrderService
 } from "./delivery.service";
 import { getUserFromRequest } from "../../middlewares/authMiddleware";
 
@@ -48,4 +49,16 @@ export const getMyOrdersController = async (
   const orders = await getMyOrdersService(String(user.id));
 
   return res.json(orders);
+};
+
+export const declineOrderController = async (
+  req: Request,
+  res: Response
+) => {
+
+  const { id } = req.params;
+
+  const order = await declineOrderService(String(id));
+
+  res.json(order);
 };

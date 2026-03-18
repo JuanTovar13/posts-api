@@ -62,3 +62,22 @@ export const getMyOrdersService = async (deliveryId: string) => {
 
   return result.rows;
 };
+
+export const declineOrderService = async (
+  orderId: string
+) => {
+
+  const result = await pool.query(
+    `
+    UPDATE orders
+    SET 
+      delivery_id = NULL,
+      status = 'pending'
+    WHERE id = $1
+    RETURNING *
+    `,
+    [orderId]
+  );
+
+  return result.rows[0];
+};
