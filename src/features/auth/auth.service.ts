@@ -37,11 +37,12 @@ export const authenticateUserService = async ({
   const user = result.rows[0]
 
   return {
-    session: data.session,
-    user: data.user,
-    role: user.role,
-    name: user.name,
-    id: user.id
+    ...data,
+    user: {
+      ...data.user,
+      name: user.name,
+      role: user.role
+    }
   }
 }
 
