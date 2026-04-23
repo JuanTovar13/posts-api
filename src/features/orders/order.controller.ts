@@ -22,7 +22,7 @@ export const getOrder = async (
   next: NextFunction,
 ) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const order = await service.getOrderById(id);
     res.json(order);
   } catch (err) {
@@ -36,7 +36,7 @@ export const getOrdersByConsumerController = async (
   next: NextFunction,
 ) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const orders = await service.getOrdersWithItemsByConsumerService(id);
     res.json(orders);
   } catch (err) {
@@ -95,7 +95,7 @@ export const deleteOrderController = async (
   next: NextFunction,
 ) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const order = await service.deleteOrderService(id);
     res.json(order);
   } catch (err) {
@@ -109,7 +109,7 @@ export const acceptOrderController = async (
   next: NextFunction,
 ) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const user = getUserFromRequest(req);
     const order = await service.acceptOrderService(id, user.id);
     res.json(order);
@@ -124,7 +124,7 @@ export const updateDeliveryPositionController = async (
   next: NextFunction,
 ) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const user = getUserFromRequest(req);
     const { lat, lng } = req.body;
 

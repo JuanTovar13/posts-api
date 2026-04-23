@@ -1,7 +1,7 @@
 import { pool } from '../../config/database';
 import { supabase } from '../../config/supabase';
 import { UpsertPositionDTO, UserPosition } from './position.types';
-import { checkDeliveryProximityAndDeliver } from '../orders/order.service';
+
 
 const POSITION_WITH_USER = `
   SELECT
@@ -43,7 +43,7 @@ export const upsertPositionService = async (
   const position = rows[0];
 
   broadcastPositionUpdated(position);
-  checkDeliveryProximityAndDeliver(userId, dto.latitude, dto.longitude);
+  // checkDeliveryProximityAndDeliver(userId, dto.latitude, dto.longitude);
 
   return position;
 };

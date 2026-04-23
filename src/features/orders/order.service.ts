@@ -1,7 +1,7 @@
 import { pool } from '../../config/database';
 import { supabase } from '../../config/supabase';
 import Boom from '@hapi/boom';
-import { Order, OrderItemDTO, UpdatePositionDTO, CreateOrderDTO } from './order.types';
+import { Order, UpdatePositionDTO, CreateOrderDTO } from './order.types';
 import { OrderStatus } from '../auth/auth.types';
 
 const ARRIVAL_RADIUS_METERS = 5;
