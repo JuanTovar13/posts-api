@@ -261,7 +261,7 @@ export const markAsDeliveredService = async (orderId: string, deliveryId: string
 const broadcastOrderEvent = async (
   orderId: string,
   event: string,
-  payload: Record<string, unknown>,
+  payload: object,
 ) => {
   const channel = supabase.channel(`order:${orderId}`);
   await channel.httpSend(event, payload);
