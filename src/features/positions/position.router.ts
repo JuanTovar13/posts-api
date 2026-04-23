@@ -1,15 +1,15 @@
-import { Router } from "express";
-import { authMiddleware } from "../../middlewares/authMiddleware";
+import { Router } from 'express';
+import { authMiddleware } from '../../middlewares/authMiddleware';
 import {
   getPositionsController,
-  createPositionController,
-  updatePositionController,
+  upsertPositionController,
   deletePositionController,
-} from "./position.controller";
+} from './position.controller';
 
-export const router = Router();
-router.use(authMiddleware);
-router.get("/", getPositionsController);
-router.post("/", createPositionController);
-router.patch("/", updatePositionController);
-router.delete("/", deletePositionController);
+export const positionsRouter = Router();
+
+positionsRouter.use(authMiddleware);
+
+positionsRouter.get('/',  getPositionsController);
+positionsRouter.put('/',  upsertPositionController);
+positionsRouter.delete('/', deletePositionController);

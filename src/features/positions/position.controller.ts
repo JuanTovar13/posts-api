@@ -1,47 +1,55 @@
-import { Request, Response } from "express";
-import Boom from "@hapi/boom";
-import { getUserFromRequest } from "../../middlewares/authMiddleware";
+import { Request, Response, NextFunction } from 'express';
+import Boom from '@hapi/boom';
+import { getUserFromRequest } from '../../middlewares/authMiddleware';
 import {
   getPositionsService,
-  createPositionService,
-  updatePositionService,
+  upsertPositionService,
   deletePositionService,
-} from "./position.service";
+} from './position.service';
 
-export const getPositionsController = async (req: Request, res: Response) => {
-  const positions = await getPositionsService();
-  return res.json(positions);
-};
-
-export const createPositionController = async (req: Request, res: Response) => {
-  const user = getUserFromRequest(req);
-  const { latitude, longitude } = req.body;
-
-  if (typeof latitude !== "number" || typeof longitude !== "number") {
-    throw Boom.badRequest("latitude and longitude must be numbers");
+export const getPositionsController = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const positions = await getPositionsService();
+    res.json(positions);
+  } catch (err) {
+    next(err);
   }
-
-  const position = await createPositionService(user.id, { latitude, longitude });
-  return res.status(201).json(position);
 };
 
-export const updatePositionController = async (req: Request, res: Response) => {
-  const user = getUserFromRequest(req);
-  const { latitude, longitude } = req.body;
+export const upsertPositionController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const user = getUserFromRequest(req);
+    const { latitude, longitude } = req.body;
 
-  if (typeof latitude !== "number" || typeof longitude !== "number") {
-    throw Boom.badRequest("latitude and longitude must be numbers");
+    if (typeof latitude !== 'number' || typeof longitude !== 'number') {
+      throw Boom.badRequest('latitude and longitude must be numbers');
+    }
+
+    const position = await upsertPositionService(user.id, { latitude, longitude });
+    res.json(position);
+  } catch (err) {
+    next(err);
   }
-
-  const position = await updatePositionService(user.id, {
-    latitude,
-    longitude,
-  });
-  return res.json(position);
 };
 
-export const deletePositionController = async (req: Request, res: Response) => {
-  const user = getUserFromRequest(req);
-  await deletePositionService(user.id);
-  return res.status(204).send();
+export const deletePositionController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const user = getUserFromRequest(req);
+    await deletePositionService(user.id);
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
 };
