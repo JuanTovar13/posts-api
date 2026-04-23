@@ -1,4 +1,4 @@
-export type OrderStatus = 'pending' | 'accepted' | 'delivered' | 'cancelled';
+import { OrderStatus } from '../auth/auth.types';
 
 export interface Order {
   id: string;
@@ -6,12 +6,12 @@ export interface Order {
   delivery_id: string | null;
   store_id: string;
   status: OrderStatus;
-  pickup_lat: number | null;
-  pickup_lng: number | null;
+  delivery_position: string | null;
+  destination: string;
   created_at: string;
 }
 
-export interface OrderItemInput {
+export interface OrderItemDTO {
   product_id: string;
   quantity: number;
 }
@@ -19,10 +19,12 @@ export interface OrderItemInput {
 export interface CreateOrderDTO {
   consumer_id: string;
   store_id: string;
-  items: OrderItemInput[];
+  destination_lat: number;
+  destination_lng: number;
+  items: OrderItemDTO[];
 }
 
-export interface OrderItemDTO {
-  product_id: string;
-  quantity: number;
+export interface UpdatePositionDTO {
+  lat: number;
+  lng: number;
 }

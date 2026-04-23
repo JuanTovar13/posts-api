@@ -4,6 +4,12 @@ export enum UserRole {
   DELIVERY = "delivery"
 }
 
+export enum OrderStatus {
+  CREATED     = 'Creado',
+  IN_DELIVERY = 'En entrega',
+  DELIVERED   = 'Entregado',
+}
+
 export interface AuthenticateUserDTO {
   email: string
   password: string

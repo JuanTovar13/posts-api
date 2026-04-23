@@ -8,26 +8,26 @@ export const ordersRouter = Router();
 
 ordersRouter.use(authMiddleware);
 
-// All orders
+// GET /api/orders — all orders (store can use this)
 ordersRouter.get('/', controller.getOrders);
 
-// Pending orders — for delivery role to browse and accept
+// GET /api/orders/pending — pending orders for delivery to browse
 ordersRouter.get('/pending', rolesMiddleware([UserRole.DELIVERY]), controller.getPendingOrdersController);
 
-// Orders by consumer
+// GET /api/orders/consumer/:id — orders by consumer with items
 ordersRouter.get('/consumer/:id', controller.getOrdersByConsumerController);
 
-// Single order
+// GET /api/orders/:id — single order detail with position
 ordersRouter.get('/:id', controller.getOrder);
 
-// Create order
+// POST /api/orders — consumer creates order with destination coords
 ordersRouter.post('/', rolesMiddleware([UserRole.CONSUMER]), controller.createOrderController);
 
-// Delete order
+// DELETE /api/orders/:id — consumer deletes order
 ordersRouter.delete('/:id', rolesMiddleware([UserRole.CONSUMER]), controller.deleteOrderController);
 
-// Delivery accepts order (self-assigns)
-ordersRouter.patch('/:id/delivery', rolesMiddleware([UserRole.DELIVERY]), controller.assignDelivery);
+// PATCH /api/orders/:id/accept — delivery accepts order → status: "En entrega"
+ordersRouter.patch('/:id/accept', rolesMiddleware([UserRole.DELIVERY]), controller.acceptOrderController);
 
-// Update order status (delivery marks as delivered, store cancels, etc.)
-ordersRouter.patch('/:id/status', authMiddleware, controller.updateOrderStatusController);
+// PATCH /api/orders/:id/position — delivery updates position → triggers ST_DWithin check
+ordersRouter.patch('/:id/position', rolesMiddleware([UserRole.DELIVERY]), controller.updateDeliveryPositionController);
