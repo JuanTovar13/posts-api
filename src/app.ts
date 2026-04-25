@@ -19,15 +19,13 @@ app.get('/', (req, res) => {
 });
 
 // Routes
-const apiRouter = Router();
-app.use("/auth", authRouter)
-app.use('/api', apiRouter);
-app.use("/users", usersRouter)
-app.use("/stores", storesRouter)
-app.use("/products", productsRouter)
-app.use("/orders", ordersRouter)
-app.use("/delivery", deliveryRouter)
-app.use("/order-items", itemsRouter);
+app.use('/api/auth',        authRouter);
+app.use('/api/users',       usersRouter);
+app.use('/api/stores',      storesRouter);
+app.use('/api/products',    productsRouter);
+app.use('/api/orders',      ordersRouter);
+app.use('/api/delivery',    deliveryRouter);
+app.use('/api/order-items', itemsRouter);
 
 
 
