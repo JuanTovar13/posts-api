@@ -256,6 +256,36 @@ export const markAsDeliveredService = async (orderId: string, deliveryId: string
   return order;
 };
 
+export const updateOrderStatusService = async (
+  orderId: string,
+  deliveryId: string,
+  status: OrderStatus,
+) => {
+  const result = await pool.query(
+    `UPDATE orders
+     SET status = $1
+     WHERE id = $2 AND delivery_id = $3
+     RETURNING
+       id, consumer_id, delivery_id, store_id, status, created_at,
+       ST_Y(destination::geometry) AS destination_lat,
+       ST_X(destination::geometry) AS destination_lng,
+       ST_Y(delivery_position::geometry) AS delivery_lat,
+       ST_X(delivery_position::geometry) AS delivery_lng`,
+    [status, orderId, deliveryId],
+  );
+
+  const order = result.rows[0];
+  if (!order) throw Boom.notFound('Order not found or not authorized');
+
+  if (status === OrderStatus.DELIVERED) {
+    await broadcastOrderEvent(orderId, 'order-delivered', order);
+  } else {
+    await broadcastOrderEvent(orderId, 'order-status-updated', order);
+  }
+
+  return order;
+};
+
 // ─── Broadcast ───────────────────────────────────────────────────────────────
 
 const broadcastOrderEvent = async (

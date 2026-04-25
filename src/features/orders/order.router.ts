@@ -31,3 +31,5 @@ ordersRouter.patch('/:id/accept', rolesMiddleware([UserRole.DELIVERY]), controll
 
 // PATCH /api/orders/:id/position — delivery updates position → triggers ST_DWithin check
 ordersRouter.patch('/:id/position', rolesMiddleware([UserRole.DELIVERY]), controller.updateDeliveryPositionController);
+
+ordersRouter.patch('/:id/status',   rolesMiddleware([UserRole.DELIVERY]),  controller.updateOrderStatusController);

@@ -2,6 +2,10 @@ import { Request, Response, NextFunction } from 'express';
 import Boom from '@hapi/boom';
 import * as service from './order.service';
 import { getUserFromRequest } from '../../middlewares/authMiddleware';
+import { OrderStatus } from '../auth/auth.types';
+
+
+const VALID_STATUSES = Object.values(OrderStatus);
 
 export const getOrders = async (
   _req: Request,
@@ -137,4 +141,19 @@ export const updateDeliveryPositionController = async (
   } catch (err) {
     next(err);
   }
+};
+
+export const updateOrderStatusController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = getUserFromRequest(req);
+    const { status } = req.body;
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+
+    if (!VALID_STATUSES.includes(status)) {
+      throw Boom.badRequest(`status must be one of: ${VALID_STATUSES.join(', ')}`);
+    }
+
+    const order = await service.updateOrderStatusService(id, user.id, status as OrderStatus);
+    res.json(order);
+  } catch (err) { next(err); }
 };
