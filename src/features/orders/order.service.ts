@@ -4,7 +4,7 @@ import Boom from '@hapi/boom';
 import { Order, UpdatePositionDTO, CreateOrderDTO } from './order.types';
 import { OrderStatus } from '../auth/auth.types';
 
-const ARRIVAL_RADIUS_METERS = 5;
+const ARRIVAL_RADIUS_METERS = 10;
 
 // ─── Queries ────────────────────────────────────────────────────────────────
 
